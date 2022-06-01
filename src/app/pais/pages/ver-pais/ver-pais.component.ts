@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { switchMap } from "rxjs/operators"; //Permite recibir un observable y devolver otro observable
+import { switchMap, tap } from "rxjs/operators"; //Permite recibir un observable y devolver otro observable
 
+import { Country } from '../../interfaces/pais.interface';
 import { PaisService } from '../../services/pais.service';
 
 @Component({
@@ -11,6 +12,8 @@ import { PaisService } from '../../services/pais.service';
   ]
 })
 export class VerPaisComponent implements OnInit {
+
+  pais!: Country; //La admiración es para que aunque no se inicialice TS confíe en mí.
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -32,10 +35,12 @@ export class VerPaisComponent implements OnInit {
   // }
   this.activatedRoute.params
     .pipe(
-      switchMap( ({id}) => this.paisService.getPaisPorAlpha( id ) )
+      switchMap( ({id}) => this.paisService.getPaisPorAlpha( id ) ),
+      tap(console.log) //tap muestra por consola lo que devuelve el pipe
     )
-    .subscribe( resp => {
-      console.log(resp);
+    .subscribe( pais => {
+      if( pais.length > 0 )
+        this.pais = pais[pais.length-1];
     });
   }
 }
